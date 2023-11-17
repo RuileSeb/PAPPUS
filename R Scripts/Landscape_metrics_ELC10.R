@@ -83,10 +83,16 @@ df.zonal.statistic.all$green= rowSums(df.zonal.statistic.all[,c(2:5,11)])
 df.zonal.statistic.all$blue=df.zonal.statistic.all$'7'
 df.zonal.statistic.all$proportion.green=df.zonal.statistic.all$green/df.zonal.statistic.all$total
 df.zonal.statistic.all$proportion.grey=df.zonal.statistic.all$grey/df.zonal.statistic.all$total
-
 write.csv(x = df.zonal.statistic.all, file = "Output Data/df.zonal.statistic.all.csv")
 
+# graphical exploration
+df.zonal.statistic.all$urban = substr(df.zonal.statistic.all$ID, 6,6)
+df.zonal.statistic.all$UGS=substr(df.zonal.statistic.all$ID, 4,5)
+ggplot(df.zonal.statistic.all, aes(x=urban, y=proportion.green)) + geom_boxplot(notch = T) + geom_point()
+ggplot(df.zonal.statistic.all[df.zonal.statistic.all$buffer=="Buffer400",], aes(x=urban, y=proportion.green)) + geom_boxplot(notch = T) + geom_point()
+ggplot(df.zonal.statistic.all[df.zonal.statistic.all$buffer=="Buffer400",], aes(x=urban, y=proportion.green)) + geom_boxplot(notch = T) + geom_point() + facet_wrap(~city)
 
+data.buffer400=df.zonal.statistic.all[df.zonal.statistic.all$buffer=="Buffer400",]
 
-
-
+ggplot(data.buffer400, aes(x=urban, y=proportion.green)) + 
+  geom_boxplot(notch = T) + geom_point() + facet_grid(city ~ UGS)
