@@ -20,8 +20,6 @@ buffers.names=list.files("Input Data/Buffer/", recursive = T,  pattern = "\\.shp
 # 6 (Bare land, #F7E174), 
 # 7 (Water/permanent snow/ice, #2019A4), 
 # 8 (Wetland, #AEC3D6).
-
-
 ## Geneva and Zurich
 ECL10_1=terra::rast("Input Data/ECL10/ELC10_2018_10m-0000279552-0000159744.tif")
 ## Lugano
@@ -31,7 +29,7 @@ s <- sprc(ECL10_1, ECL10_2)
 ECL10_merged <- merge(s)
 terra::writeRaster(ECL10_merged, "Input Data/ECL10/ECL10_merged.tif") ## And we export it so we don't have to redo that
 ## Load the merged raster
-ECL10_merged=terra::rast("Input Data/ECL10/ECL10_merged.tif")
+ECL10_merged=terra::rast("Input Data/ECL10/ECL10_merged.tif") ## too heavy to upload it in github
 
 #### Calculation ----------------------------------------------------------------------------------
 zonal.statistic.city=list()
@@ -55,7 +53,7 @@ for (b in 1:length(buffers.list)) {
     # Format the dataframe
     df.temp$ID=buff$ID # add site ID
     df.temp$city=paste(substr(x = buffers.names[b], start = 1, stop=2)) # add site citx
-    df.temp$buffer=paste(substr(x = buffers.names[b], start = 4, stop=(nchar(buffers.names[b])-4))) # add buffer ID
+    df.temp$buffer=paste(substr(x = buffers.names[b], start = 7, stop=(nchar(buffers.names[b])-4))) # add buffer ID
     # Store as list
     data.trans[[s]]=df.temp
   }
@@ -79,7 +77,12 @@ df.lst2 <- lapply(zonal.statistic.city, function(df) {
   df})
 df.zonal.statistic.all=do.call(rbind, df.lst2)
 df.zonal.statistic.all[is.na(df.zonal.statistic.all)] <- 0 ## Tschüss NA
-
+df.zonal.statistic.all$total= rowSums(df.zonal.statistic.all[,c(1:6,10:11)])
+df.zonal.statistic.all$grey= rowSums(df.zonal.statistic.all[,c(1,6)])
+df.zonal.statistic.all$green= rowSums(df.zonal.statistic.all[,c(2:5,11)])
+df.zonal.statistic.all$blue=df.zonal.statistic.all$'7'
+df.zonal.statistic.all$proportion.green=df.zonal.statistic.all$green/df.zonal.statistic.all$total
+df.zonal.statistic.all$proportion.green=df.zonal.statistic.all$grey/df.zonal.statistic.all$total
 
 write.csv(x = df.zonal.statistic.all, file = "Output Data/df.zonal.statistic.all.csv")
 
@@ -87,4 +90,3 @@ write.csv(x = df.zonal.statistic.all, file = "Output Data/df.zonal.statistic.all
 
 
 
-                  
